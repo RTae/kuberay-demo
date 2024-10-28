@@ -63,11 +63,30 @@ resource "google_container_node_pool" "node_pool" {
         count = guest_accelerator.value.gpu_count
       }
     }
+
+    # Using labels from variables
+    labels = each.value.labels
+
+    # Using taints from variables
+    dynamic "taint" {
+      for_each = each.value.taints
+      content {
+        key    = taint.value.key
+        value  = taint.value.value
+        effect = taint.value.effect
+      }
+    }
   }
 
   autoscaling {
     min_node_count = each.value.min_node_count
     max_node_count = each.value.max_node_count
+  }
+
+  # Additional configurations
+  management {
+    auto_repair  = true
+    auto_upgrade = true
   }
 
   depends_on = [

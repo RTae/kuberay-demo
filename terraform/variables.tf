@@ -9,9 +9,3 @@ variable "region" {
   type        = string
   default     = "asia-southeast1"
 }
-
-variable "bucket_tfstate_name" {
-  description = "GCS bucket name for keeping TF State"
-  type        = string
-  default     = "rtae-lab-tfstate-12dkl"
-}

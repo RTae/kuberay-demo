@@ -34,7 +34,53 @@ module "cluster" {
   
   node_pools = [
     {
-      name           = "main"
+      name           = "common"
+      zone           = "c"
+      machine_type   = "n1-standard-2"
+      node_count     = 1
+      preemptible    = true
+      min_node_count = 1
+      max_node_count = 1
+      disk_size_gb   = 64
+      gpu_type       = "None"
+      gpu_count      = 0
+      labels         = {
+        node         = "ray-head"
+        node_type    = "cpu"
+      }
+      taints         = [
+        {
+          key    = "node"
+          value  = "ray_head"
+          effect = "NO_SCHEDULE"
+        }
+      ]
+    },
+    {
+      name           = "head"
+      zone           = "c"
+      machine_type   = "n1-standard-4"
+      node_count     = 1
+      preemptible    = true
+      min_node_count = 1
+      max_node_count = 1
+      disk_size_gb   = 64
+      gpu_type       = "None"
+      gpu_count      = 0
+      labels         = {
+        node         = "ray-head"
+        node_type    = "cpu"
+      }
+      taints         = [
+        {
+          key    = "node"
+          value  = "ray_head"
+          effect = "NO_SCHEDULE"
+        }
+      ]
+    },
+    {
+      name           = "worker"
       zone           = "c"
       machine_type   = "n1-standard-4"
       node_count     = 1
@@ -44,6 +90,17 @@ module "cluster" {
       disk_size_gb   = 64
       gpu_type       = "nvidia-tesla-t4"
       gpu_count      = 1
+      labels         = {
+        node         = "ray-worker"
+        node_type    = "gpu"
+      }
+      taints         = [
+        {
+          key    = "node"
+          value  = "ray_worker"
+          effect = "NO_SCHEDULE"
+        }
+      ]
     }
   ]
 
