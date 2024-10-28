@@ -7,7 +7,7 @@ terraform {
   }
 
   backend "gcs" {
-    bucket  = "rtae-lab-tfstate-12dkl"
+    bucket  = var.bucket_tfstate_name
     prefix  = "terraform/state"
   }
 }
