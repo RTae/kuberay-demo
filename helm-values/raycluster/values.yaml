@@ -7,8 +7,19 @@ head:
     requests:
       cpu: "1"
       memory: "2G"
-  tolerations: []
-  affinity: {}
+  tolerations:
+  - key: node
+    operator: Equal
+    value: ray_head
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: node
+            operator: In
+            values:
+            - "ray-head"
 
 worker:
   groupName: worker
@@ -23,5 +34,16 @@ worker:
     requests:
       cpu: "1"
       memory: "1G"
-  tolerations: []
-  affinity: {}
+  tolerations:
+  - key: node
+    operator: Equal
+    value: ray_worker
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: node
+            operator: In
+            values:
+            - "ray-worker"

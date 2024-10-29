@@ -78,6 +78,8 @@ resource "google_container_node_pool" "node_pool" {
     }
   }
 
+  max_pods_per_node = each.value.max_pods_per_node
+
   autoscaling {
     min_node_count = each.value.min_node_count
     max_node_count = each.value.max_node_count
