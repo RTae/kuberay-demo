@@ -5,16 +5,16 @@ module "network" {
   subnets  = [
     {
       name          = "node"
-      ip_cidr_range = "10.0.0.0/24"
+      ip_cidr_range = "10.0.0.0/22"
       region        = var.region
       secondary_ip_ranges = [
         {
             range_name    = "pod"
-            ip_cidr_range = "192.168.0.0/20"
+            ip_cidr_range = "192.168.0.0/18"
         },
         {
             range_name    = "service"
-            ip_cidr_range = "192.168.1.0/20"
+            ip_cidr_range = "192.169.0.0/18"
         },
       ]
     },

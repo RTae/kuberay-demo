@@ -28,7 +28,6 @@ helm install kuberay-operator kuberay/kuberay-operator  \
 ```bash
 helm upgrade kuberay-operator kuberay/kuberay-operator  \
     --version 1.2.2 \
-    -f helm-values/raycluster/values.yaml \
     --namespace kuberay 
 ```
 
@@ -59,6 +58,5 @@ helm install kuberay-apiserver kuberay/kuberay-apiserver  \
 ```bash
 helm upgrade kuberay-apiserver kuberay/kuberay-apiserver  \
     --version 1.2.2 \
-    -f helm-values/raycluster/values.yaml \
     --namespace kuberay 
 ```
