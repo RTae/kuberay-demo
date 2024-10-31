@@ -8,7 +8,7 @@ spec:
     applications:
     - name: llm
       route_prefix: /
-      import_path:  ray-operator.config.samples.vllm.serve:model
+      import_path: crd-demo.sample.vllm:model
       deployments:
       - name: VLLMDeployment
         num_replicas: 1
@@ -16,10 +16,11 @@ spec:
           num_cpus: 4
           # NOTE: num_gpus is set automatically based on TENSOR_PARALLELISM
       runtime_env:
-        working_dir: "https://github.com/ray-project/kuberay/archive/master.zip"
-        pip: ["vllm==0.6.3"]
+        working_dir: "https://github.com/RTae/kuberay-demo/archive/master.zip"
+        pip:
+          - vllm==0.6.3
         env_vars:
-          MODEL_ID: "google/gemma-2-2b-it"
+          MODEL_ID: "meta-llama/Llama-3.2-1B-Instruct"
           TENSOR_PARALLELISM: "1"
           PIPELINE_PARALLELISM: "1"
   rayClusterConfig:

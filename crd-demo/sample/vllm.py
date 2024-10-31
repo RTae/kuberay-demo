@@ -126,6 +126,5 @@ model = build_app(
             "model": os.environ['MODEL_ID'],
             "tensor-parallel-size": os.environ['TENSOR_PARALLELISM'],
             "pipeline-parallel-size": os.environ['PIPELINE_PARALLELISM'],
-            "dtype": "half"
         }
     )
