@@ -61,12 +61,3 @@ kubectl create ns workspace
 export HF_TOKEN=<Hugging Face access token>
 kubectl create secret generic hf-secret --from-literal=hf_api_token=${HF_TOKEN} --dry-run=client -n workspace -o yaml | kubectl apply -f -
 ```
-
-RaySystemError(RuntimeError('Failed to unpickle serialized exception'), 'Traceback (most recent call last):\n  File "/home/ray/anaconda3/lib/python3.11/site-packages/ray/exceptions.py", line 50, in from_ray_exception\n    return pickle.loads(ray_exception.serialized_exception)
-
-ModuleNotFoundError: No module named \'huggingface_hub.errors\'\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File "/home/ray/anaconda3/lib/python3.11/site-packages/ray/_private/serialization.py", line 423, in deserialize_objects\n    obj = self._deserialize_object(data, metadata, object_ref)
-
-File "/home/ray/anaconda3/lib/python3.11/site-packages/ray/_private/serialization.py", line 305, in _deserialize_object
-return RayError.from_bytes(obj)n  File "/home/ray/anaconda3/lib/python3.11/site-packages/ray/exceptions.py", line 44, in from_bytes\n    return RayError.from_ray_exception(ray_exception)
-
-File "/home/ray/anaconda3/lib/python3.11/site-packages/ray/exceptions.py", line 53, in from_ray_exception\n    raise RuntimeError(msg) from e\nRuntimeError: Failed to unpickle serialized exception\n')
