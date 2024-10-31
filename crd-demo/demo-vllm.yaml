@@ -1,8 +1,8 @@
 apiVersion: ray.io/v1
 kind: RayService
 metadata:
-  name: llama-3-3b
-  namespace : kuberay
+  name: llm
+  namespace : workspace
 spec:
   serveConfigV2: |
     applications:
@@ -13,13 +13,13 @@ spec:
       - name: VLLMDeployment
         num_replicas: 1
         ray_actor_options:
-          num_cpus: 2
+          num_cpus: 4
           # NOTE: num_gpus is set automatically based on TENSOR_PARALLELISM
       runtime_env:
         working_dir: "https://github.com/ray-project/kuberay/archive/master.zip"
         pip: ["vllm==0.6.3"]
         env_vars:
-          MODEL_ID: "meta-llama/Llama-3.2-3B-Instruct"
+          MODEL_ID: "google/gemma-2-2b-it"
           TENSOR_PARALLELISM: "1"
           PIPELINE_PARALLELISM: "1"
   rayClusterConfig:
@@ -33,11 +33,11 @@ spec:
             image: rayproject/ray-ml:2.33.0.914af0-py311
             resources:
               limits:
-                cpu: "1"
-                memory: "2Gi"
+                cpu: "2"
+                memory: "4Gi"
               requests:
-                cpu: "1"
-                memory: "2Gi"
+                cpu: "2"
+                memory: "4Gi"
             ports:
             - containerPort: 6379
               name: gcs-server
@@ -69,7 +69,7 @@ spec:
     workerGroupSpecs:
     - replicas: 1
       minReplicas: 0
-      maxReplicas: 4
+      maxReplicas: 2
       groupName: gpu-group
       rayStartParams: {}
       template:
@@ -85,12 +85,12 @@ spec:
                   key: hf_api_token
             resources:
               limits:
-                cpu: "3"
-                memory: "4Gi"
+                cpu: "4"
+                memory: "16Gi"
                 nvidia.com/gpu: "1"
               requests:
-                cpu: "3"
-                memory: "4Gi"
+                cpu: "4"
+                memory: "16Gi"
                 nvidia.com/gpu: "1"
           tolerations:
           - key: node
