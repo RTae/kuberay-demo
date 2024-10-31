@@ -63,12 +63,12 @@ class VLLMDeployment:
             self.openai_serving_chat = OpenAIServingChat(
                 self.engine,
                 model_config,
-                served_model=served_model_names,
-                response_role=self.response_role,
+                served_model_names,
+                self.response_role,
                 lora_modules=self.lora_modules,
+                prompt_adapters=self.prompt_adapters,
+                request_logger=self.request_logger,
                 chat_template=self.chat_template,
-                prompt_adapters=None,
-                request_logger=None,
             )
         logger.info(f"Request: {request}")
         generator = await self.openai_serving_chat.create_chat_completion(
