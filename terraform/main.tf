@@ -41,8 +41,8 @@ module "cluster" {
       preemptible       = true
       min_node_count    = 1
       max_node_count    = 1
-      disk_size_gb      = 64
-      max_pods_per_node = 40
+      disk_size_gb      = 128
+      max_pods_per_node = 60
       labels            = {
         node      = "common"
         node_type = "cpu"
@@ -57,8 +57,8 @@ module "cluster" {
       preemptible       = true
       min_node_count    = 1
       max_node_count    = 1
-      disk_size_gb      = 64
-      max_pods_per_node = 40
+      disk_size_gb      = 128
+      max_pods_per_node = 60
       labels            = {
         node      = "ray-head"
         node_type = "cpu"
@@ -74,15 +74,15 @@ module "cluster" {
     {
       name              = "worker"
       zone              = "c"
-      machine_type      = "n1-standard-4"
+      machine_type      = "n1-standard-8"
       node_count        = 1
       preemptible       = true
       min_node_count    = 1
       max_node_count    = 1
-      disk_size_gb      = 64
+      disk_size_gb      = 128
       gpu_type          = "nvidia-tesla-t4"
       gpu_count         = 1
-      max_pods_per_node = 40
+      max_pods_per_node = 60
       labels         = {
         node            = "ray-worker"
         node_type       = "gpu"

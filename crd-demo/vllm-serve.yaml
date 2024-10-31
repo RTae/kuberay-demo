@@ -1,0 +1,107 @@
+apiVersion: ray.io/v1
+kind: RayService
+metadata:
+  name: llama-3-3b
+  namespace : kuberay
+spec:
+  serveConfigV2: |
+    applications:
+    - name: llm
+      route_prefix: /
+      import_path:  ray-operator.config.samples.vllm.serve:model
+      deployments:
+      - name: VLLMDeployment
+        num_replicas: 1
+        ray_actor_options:
+          num_cpus: 2
+          # NOTE: num_gpus is set automatically based on TENSOR_PARALLELISM
+      runtime_env:
+        working_dir: "https://github.com/ray-project/kuberay/archive/master.zip"
+        pip: ["vllm==0.6.3"]
+        env_vars:
+          MODEL_ID: "meta-llama/Llama-3.2-3B-Instruct"
+          TENSOR_PARALLELISM: "1"
+          PIPELINE_PARALLELISM: "1"
+  rayClusterConfig:
+    headGroupSpec:
+      rayStartParams:
+        dashboard-host: '0.0.0.0'
+      template:
+        spec:
+          containers:
+          - name: ray-head
+            image: rayproject/ray-ml:2.33.0.914af0-py311
+            resources:
+              limits:
+                cpu: "1"
+                memory: "2Gi"
+              requests:
+                cpu: "1"
+                memory: "2Gi"
+            ports:
+            - containerPort: 6379
+              name: gcs-server
+            - containerPort: 8265
+              name: dashboard
+            - containerPort: 10001
+              name: client
+            - containerPort: 8000
+              name: serve
+            env:
+            - name: HUGGING_FACE_HUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: hf-secret
+                  key: hf_api_token
+          tolerations:
+          - key: node
+            operator: Equal
+            value: ray_head
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: node
+                    operator: In
+                    values:
+                    - "ray-head"
+    workerGroupSpecs:
+    - replicas: 1
+      minReplicas: 0
+      maxReplicas: 4
+      groupName: gpu-group
+      rayStartParams: {}
+      template:
+        spec:
+          containers:
+          - name: llm
+            image: rayproject/ray-ml:2.33.0.914af0-py311
+            env:
+            - name: HUGGING_FACE_HUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: hf-secret
+                  key: hf_api_token
+            resources:
+              limits:
+                cpu: "3"
+                memory: "4Gi"
+                nvidia.com/gpu: "1"
+              requests:
+                cpu: "3"
+                memory: "4Gi"
+                nvidia.com/gpu: "1"
+          tolerations:
+          - key: node
+            operator: Equal
+            value: ray_worker
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: node
+                    operator: In
+                    values:
+                    - "ray-worker"
