@@ -28,7 +28,7 @@ def prepare_for_output(batch):
         "score": batch["score"],
         "label": batch["label"],
         "path": batch["path"],
-        "timestamp": batch["timestamp"]
+        "timestamp": batch["timestamp"][0]
     }
 
 if __name__ == "__main__":
