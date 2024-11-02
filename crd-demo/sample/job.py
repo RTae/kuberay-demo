@@ -3,6 +3,7 @@ from typing import Dict
 from PIL import Image
 import numpy as np
 import ray
+import time
 
 class ImageClassifier:
     def __init__(self, batch_size = 16):
@@ -16,17 +17,18 @@ class ImageClassifier:
             top_k=1,
             batch_size=self.BATCH_SIZE)
 
-        # `outputs` is a list of length-one lists. For example:
-        # [[{'score': '...', 'label': '...'}], ..., [{'score': '...', 'label': '...'}]]
         batch["score"] = [output[0]["score"] for output in outputs]
         batch["label"] = [output[0]["label"] for output in outputs]
+        batch["path"]  = batch['path']
+        batch["timestamp"] = [time.time()]
         return batch
 
 def prepare_for_output(batch):
     return {
         "score": batch["score"],
         "label": batch["label"],
-        "path": batch["path"]
+        "path": batch["path"],
+        "timestamp": batch["timestamp"]
     }
 
 if __name__ == "__main__":
