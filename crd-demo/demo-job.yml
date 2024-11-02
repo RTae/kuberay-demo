@@ -40,7 +40,7 @@ spec:
             - containerPort: 8000
               name: serve
             env:
-            - name: HUGGING_FACE_HUB_TOKEN
+            - name: HF_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: hf-secret
@@ -89,7 +89,7 @@ spec:
                 memory: "16Gi"
                 nvidia.com/gpu: "1"
             env:
-            - name: HUGGING_FACE_HUB_TOKEN
+            - name: HF_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: hf-secret
