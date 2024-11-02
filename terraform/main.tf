@@ -1,3 +1,7 @@
+data "google_project" "project" {
+  project_id = var.project_id
+}
+
 module "network" {
   source   = "./modules/vpc"
 
@@ -92,6 +96,41 @@ module "cluster" {
           key    = "node"
           value  = "ray_worker"
           effect = "NO_SCHEDULE"
+        },
+        {
+          key    = "type"
+          value  = "serving"
+          effect = "NO_SCHEDULE"
+        }
+      ]
+    },
+    {
+      name              = "train"
+      zone              = "c"
+      machine_type      = "a3-highgpu-1g"
+      node_count        = 0
+      preemptible       = true
+      min_node_count    = 0
+      max_node_count    = 3
+      disk_size_gb      = 128
+      disk_type         = "pd-ssd"
+      gpu_type          = "nvidia-h100-80gb"
+      gpu_count         = 1
+      max_pods_per_node = 60
+      labels         = {
+        node            = "ray-worker"
+        node_type       = "gpu"
+      }
+      taints         = [
+        {
+          key    = "node"
+          value  = "ray_worker"
+          effect = "NO_SCHEDULE"
+        },
+        {
+          key    = "type"
+          value  = "training"
+          effect = "NO_SCHEDULE"
         }
       ]
     }
@@ -101,3 +140,16 @@ module "cluster" {
     module.network
   ]
 }
+
+module "gcs" {
+  source   = "./modules/gcs"
+
+  name     = "train-checkpoint"
+  location = var.region
+  bucket_members = [
+    {
+      member = "principal://iam.googleapis.com/projects/${data.google_project.project.number}/locations/global/workloadIdentityPools/${var.project_id}.svc.id.goog/subject/ns/workspace/sa/training",
+      role   = "roles/storage.objectUser"
+    }
+  ]
+} 

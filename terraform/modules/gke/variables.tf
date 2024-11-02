@@ -1,3 +1,9 @@
+variable "project_id" {
+  description = "Project ID"
+  type        = string
+  default     = "rtae-lab"
+}
+
 # Cluster name
 variable "cluster_name" {
   description = "The name of the GKE cluster"
@@ -8,6 +14,7 @@ variable "cluster_name" {
 variable "region" {
   description = "The primary region for the GKE cluster"
   type        = string
+  default     = "asia-southeast1"
 }
 
 # VPC network for the GKE cluster
@@ -36,17 +43,18 @@ variable "service_range_name" {
 variable "node_pools" {
   description = "List of node pools with configuration details for each pool"
   type = list(object({
-    name              = string                 # Name of the node pool
-    zone              = string                 # Zone for the node pool
-    machine_type      = string                 # Machine type for the nodes in this pool
-    node_count        = number                 # Initial number of nodes
-    preemptible       = bool                   # Whether the nodes are preemptible
-    min_node_count    = number                 # Minimum number of nodes (for autoscaling)
-    max_node_count    = number                 # Maximum number of nodes (for autoscaling)
-    max_pods_per_node = optional(number, 110)  # Maximum pod per node
-    disk_size_gb      = number                 # Size of the disk in GB
-    gpu_type          = optional(string, null) # Type of GPU (e.g., nvidia-tesla-t4)
-    gpu_count         = optional(number, 0)                 # Number of GPUs per node
+    name              = string                          # Name of the node pool
+    zone              = string                          # Zone for the node pool
+    machine_type      = string                          # Machine type for the nodes in this pool
+    node_count        = number                          # Initial number of nodes
+    preemptible       = bool                            # Whether the nodes are preemptible
+    min_node_count    = number                          # Minimum number of nodes (for autoscaling)
+    max_node_count    = number                          # Maximum number of nodes (for autoscaling)
+    max_pods_per_node = optional(number, 110)           # Maximum pod per node
+    disk_size_gb      = number                          # Size of the disk in GB
+    disk_type         = optional(string, "pd-standard") # Disk type
+    gpu_type          = optional(string, null)          # Type of GPU (e.g., nvidia-tesla-t4)
+    gpu_count         = optional(number, 0)             # Number of GPUs per node
     labels            = map(string)
     taints            = list(object({
                         key    = string

@@ -18,6 +18,10 @@ resource "google_container_cluster" "cluster" {
     services_secondary_range_name = var.service_range_name
   }
 
+  workload_identity_config {
+    workload_pool = "${var.project_id}.svc.id.goog"
+  }
+
   addons_config {
     http_load_balancing {
       disabled = false
@@ -46,7 +50,7 @@ resource "google_container_node_pool" "node_pool" {
     preemptible     = each.value.preemptible
     service_account = google_service_account.cluster_sa.email
     disk_size_gb    = each.value.disk_size_gb
-    disk_type       = "pd-standard"
+    disk_type       = each.value.disk_type
     oauth_scopes = [
       "https://www.googleapis.com/auth/logging.write",
       "https://www.googleapis.com/auth/monitoring",
@@ -55,6 +59,10 @@ resource "google_container_node_pool" "node_pool" {
       "https://www.googleapis.com/auth/service.management.readonly",
       "https://www.googleapis.com/auth/servicecontrol",
     ]
+
+    workload_metadata_config {
+      mode = "GKE_METADATA"
+    }
 
     dynamic "guest_accelerator" {
       for_each = each.value.gpu_count > 0 ? [each.value] : []
