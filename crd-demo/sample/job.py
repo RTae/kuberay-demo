@@ -27,7 +27,6 @@ def prepare_for_output(batch):
         "score": batch["score"],
         "label": batch["label"],
         "path": batch["path"],
-        "timestamp": np.array([time.time()])
     }
 
 if __name__ == "__main__":
