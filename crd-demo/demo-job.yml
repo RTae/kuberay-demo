@@ -1,5 +1,5 @@
 apiVersion: ray.io/v1
-kind: RayService
+kind: RayJob
 metadata:
   name: batch-inference
   namespace : workspace
@@ -14,7 +14,7 @@ spec:
       - torchvision
       - transformers
     working_dir: "https://github.com/RTae/kuberay-demo/archive/master.zip"
-  rayClusterConfig:
+  rayClusterSpec:
     headGroupSpec:
       rayStartParams:
         dashboard-host: '0.0.0.0'
@@ -45,9 +45,6 @@ spec:
                 secretKeyRef:
                   name: hf-secret
                   key: hf_api_token
-            volumeMounts:
-              - mountPath: /home/app
-                name: code-sample
           tolerations:
           - key: node
             operator: Equal
@@ -61,13 +58,6 @@ spec:
                     operator: In
                     values:
                     - "ray-head"
-          volumes:
-            - name: code-sample
-              configMap:
-                name: ray-job-code-sample
-                items:
-                  - key: main.py
-                    path: main.py
     workerGroupSpecs:
     - replicas: 1
       minReplicas: 0
@@ -94,9 +84,6 @@ spec:
                 secretKeyRef:
                   name: hf-secret
                   key: hf_api_token
-            volumeMounts:
-              - mountPath: /home/ray/samples
-                name: code-sample
           tolerations:
           - key: node
             operator: Equal
