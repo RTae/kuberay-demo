@@ -24,19 +24,20 @@ class ImageClassifier:
 
 if __name__ == "__main__":
 
-    s3_uri = "/mnt/cluster_storage/03102024/"
+    image_path = "/mnt/cluster_storage/03102024/"
+    batch_size=16
 
     ds = ray.data.read_images(
-        s3_uri, mode="RGB"
+        image_path, mode="RGB"
     )
 
     predictions = ds.map_batches(
         ImageClassifier,
-        concurrency=1, # Change this number based on the number of GPUs in your cluster.
-        num_gpus=1, # Specify 1 GPU per model replica.
-        batch_size=16 # Use the largest batch size that can fit on our GPUs
+        concurrency=1,
+        num_gpus=1,
+        batch_size=batch_size
     )
-    prediction_batch = predictions.take_batch(5)
+    prediction_batch = predictions.iter_batches(batch_size=batch_size)
     print("A few sample predictions: ")
-    for prediction in prediction_batch["label"]:
-        print("Label: ", prediction)
+    for pred in prediction_batch["label"]:
+        print("Label: ", pred)

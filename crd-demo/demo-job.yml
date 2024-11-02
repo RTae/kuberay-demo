@@ -3,6 +3,8 @@ kind: ServiceAccount
 metadata:
   name: demo1
   namespace: workspace
+  annotations:
+    iam.gke.io/gcp-service-account: batch-demo@rtae-lab.iam.gserviceaccount.com
 ---
 apiVersion: ray.io/v1
 kind: RayJob
@@ -34,6 +36,8 @@ spec:
             gke-gcsfuse/ephemeral-storage-limit: 10Gi
         spec:
           serviceAccountName: demo1
+          nodeSelector:
+            iam.gke.io/gke-metadata-server-enabled: "true"
           containers:
           - name: ray-head
             image: rayproject/ray-ml:2.33.0.914af0-py311
@@ -101,6 +105,8 @@ spec:
             gke-gcsfuse/ephemeral-storage-limit: 10Gi
         spec:
           serviceAccountName: demo1
+          nodeSelector:
+            iam.gke.io/gke-metadata-server-enabled: "true"
           containers:
           - name: task
             image: rayproject/ray-ml:2.33.0.914af0-py311-gpu
