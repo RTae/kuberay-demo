@@ -20,7 +20,6 @@ class ImageClassifier:
         batch["score"] = [output[0]["score"] for output in outputs]
         batch["label"] = [output[0]["label"] for output in outputs]
         batch["path"]  = batch['path']
-        batch["timestamp"] = np.array([time.time()])
         return batch
 
 def prepare_for_output(batch):
@@ -28,7 +27,7 @@ def prepare_for_output(batch):
         "score": batch["score"],
         "label": batch["label"],
         "path": batch["path"],
-        "timestamp": batch["timestamp"]
+        "timestamp": np.array([time.time()])
     }
 
 if __name__ == "__main__":
