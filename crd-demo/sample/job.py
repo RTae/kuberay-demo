@@ -24,7 +24,7 @@ class ImageClassifier:
 
 if __name__ == "__main__":
 
-    s3_uri = "s3://anonymous@air-example-data-2/imagenette2/val/"
+    s3_uri = "/mnt/cluster_storage/03102024/"
 
     ds = ray.data.read_images(
         s3_uri, mode="RGB"

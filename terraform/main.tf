@@ -141,15 +141,33 @@ module "cluster" {
   ]
 }
 
+locals {
+  buckets = [
+    {
+      base_name = "landing-data"
+      bucket_members = [
+        {
+          member = "principal://iam.googleapis.com/projects/${data.google_project.project.number}/locations/global/workloadIdentityPools/${var.project_id}.svc.id.goog/subject/ns/workspace/sa/demo1",
+          role   = "roles/storage.objectUser"
+        }
+      ]
+    },
+  ]
+}
+resource "random_string" "suffix" {
+  for_each = { for idx in range(length(local.buckets)) : idx => idx }
+  length          = 4
+  special         = false
+  upper           = false
+  lower           = true
+  numeric         = true
+}
 module "gcs" {
+  for_each = { for idx, bucket in local.buckets : idx => bucket }
+
   source   = "./modules/gcs"
 
-  name     = "train-checkpoint"
+  name     = "${each.value.base_name}-${random_string.suffix[each.key].result}"
   location = var.region
-  bucket_members = [
-    {
-      member = "principal://iam.googleapis.com/projects/${data.google_project.project.number}/locations/global/workloadIdentityPools/${var.project_id}.svc.id.goog/subject/ns/workspace/sa/demo1",
-      role   = "roles/storage.objectUser"
-    }
-  ]
-} 
+  bucket_members = each.value.bucket_members
+}

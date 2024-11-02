@@ -1,3 +1,9 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: demo1
+  namespace: workspace
+---
 apiVersion: ray.io/v1
 kind: RayJob
 metadata:
@@ -5,7 +11,7 @@ metadata:
   namespace : workspace
 spec:
   entrypoint: python crd-demo/sample/job.py
-  shutdownAfterJobFinishes: true
+  #shutdownAfterJobFinishes: true
   runtimeEnvYAML: |
     pip:
       - numpy
@@ -19,7 +25,14 @@ spec:
       rayStartParams:
         dashboard-host: '0.0.0.0'
       template:
+        metadata:
+          annotations:
+            gke-gcsfuse/volumes: "true"
+            gke-gcsfuse/cpu-limit: "0"
+            gke-gcsfuse/memory-limit: 5Gi
+            gke-gcsfuse/ephemeral-storage-limit: 10Gi
         spec:
+          serviceAccountName: demo1
           containers:
           - name: ray-head
             image: rayproject/ray-ml:2.33.0.914af0-py311
@@ -45,6 +58,20 @@ spec:
                 secretKeyRef:
                   name: hf-secret
                   key: hf_api_token
+            volumeMounts:
+              - mountPath: /tmp/ray
+                name: ray-logs
+              - mountPath: /mnt/cluster_storage
+                name: cluster-storage
+          volumes:
+            - name: ray-logs
+              emptyDir: {}
+            - name: cluster-storage
+              csi:
+                driver: gcsfuse.csi.storage.gke.io
+                volumeAttributes:
+                  bucketName: landing-data-zhsp
+                  mountOptions: "implicit-dirs,uid=1000,gid=100"
           tolerations:
           - key: node
             operator: Equal
@@ -65,7 +92,14 @@ spec:
       groupName: worker-group
       rayStartParams: {}
       template:
+        metadata:
+          annotations:
+            gke-gcsfuse/volumes: "true"
+            gke-gcsfuse/cpu-limit: "0"
+            gke-gcsfuse/memory-limit: 5Gi
+            gke-gcsfuse/ephemeral-storage-limit: 10Gi
         spec:
+          serviceAccountName: demo1
           containers:
           - name: task
             image: rayproject/ray-ml:2.33.0.914af0-py311-gpu
@@ -84,6 +118,20 @@ spec:
                 secretKeyRef:
                   name: hf-secret
                   key: hf_api_token
+            volumeMounts:
+              - mountPath: /tmp/ray
+                name: ray-logs
+              - mountPath: /mnt/cluster_storage
+                name: cluster-storage
+          volumes:
+            - name: ray-logs
+              emptyDir: {}
+            - name: cluster-storage
+              csi:
+                driver: gcsfuse.csi.storage.gke.io
+                volumeAttributes:
+                  bucketName: landing-data-zhsp
+                  mountOptions: "implicit-dirs,uid=1000,gid=100"
           tolerations:
           - key: node
             operator: Equal
