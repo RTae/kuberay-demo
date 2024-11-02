@@ -22,6 +22,7 @@ spec:
       - torch
       - torchvision
       - transformers
+      - google-cloud-bigquery
     working_dir: "https://github.com/RTae/kuberay-demo/archive/master.zip"
   rayClusterSpec:
     headGroupSpec:
