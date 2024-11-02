@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
     predictions = ds.map_batches(
         ImageClassifier,
-        compute=ray.data.ActorPoolStrategy(size=1), # Change this number based on the number of GPUs in your cluster.
+        concurrency=1, # Change this number based on the number of GPUs in your cluster.
         num_gpus=1, # Specify 1 GPU per model replica.
         batch_size=16 # Use the largest batch size that can fit on our GPUs
     )
