@@ -1,0 +1,115 @@
+apiVersion: ray.io/v1
+kind: RayService
+metadata:
+  name: batch-inference
+  namespace : workspace
+spec:
+  entrypoint: python crd-demo/sample/job.py
+  shutdownAfterJobFinishes: true
+  runtimeEnvYAML: |
+    pip:
+      - numpy
+      - datasets
+      - torch
+      - torchvision
+      - transformers
+    working_dir: "https://github.com/RTae/kuberay-demo/archive/master.zip"
+  rayClusterConfig:
+    headGroupSpec:
+      rayStartParams:
+        dashboard-host: '0.0.0.0'
+      template:
+        spec:
+          containers:
+          - name: ray-head
+            image: rayproject/ray-ml:2.33.0.914af0-py311
+            resources:
+              limits:
+                cpu: "2"
+                memory: "4Gi"
+              requests:
+                cpu: "2"
+                memory: "4Gi"
+            ports:
+            - containerPort: 6379
+              name: gcs-server
+            - containerPort: 8265
+              name: dashboard
+            - containerPort: 10001
+              name: client
+            - containerPort: 8000
+              name: serve
+            env:
+            - name: HUGGING_FACE_HUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: hf-secret
+                  key: hf_api_token
+            volumeMounts:
+              - mountPath: /home/app
+                name: code-sample
+          tolerations:
+          - key: node
+            operator: Equal
+            value: ray_head
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: node
+                    operator: In
+                    values:
+                    - "ray-head"
+          volumes:
+            - name: code-sample
+              configMap:
+                name: ray-job-code-sample
+                items:
+                  - key: main.py
+                    path: main.py
+    workerGroupSpecs:
+    - replicas: 1
+      minReplicas: 0
+      maxReplicas: 2
+      groupName: worker-group
+      rayStartParams: {}
+      template:
+        spec:
+          containers:
+          - name: task
+            image: rayproject/ray-ml:2.33.0.914af0-py311-gpu
+            resources:
+              limits:
+                cpu: "6"
+                memory: "16Gi"
+                nvidia.com/gpu: "1"
+              requests:
+                cpu: "6"
+                memory: "16Gi"
+                nvidia.com/gpu: "1"
+            env:
+            - name: HUGGING_FACE_HUB_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: hf-secret
+                  key: hf_api_token
+            volumeMounts:
+              - mountPath: /home/ray/samples
+                name: code-sample
+          tolerations:
+          - key: node
+            operator: Equal
+            value: ray_worker
+          - key: type
+            operator: Equal
+            value: small
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: node
+                    operator: In
+                    values:
+                    - "ray-worker"

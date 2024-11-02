@@ -76,7 +76,7 @@ module "cluster" {
       ]
     },
     {
-      name              = "worker"
+      name              = "worker-small"
       zone              = "c"
       machine_type      = "n1-standard-8"
       node_count        = 1
@@ -99,16 +99,16 @@ module "cluster" {
         },
         {
           key    = "type"
-          value  = "serving"
+          value  = "small"
           effect = "NO_SCHEDULE"
         }
       ]
     },
     {
-      name              = "train"
+      name              = "worker-large"
       zone              = "c"
       machine_type      = "a3-highgpu-1g"
-      node_count        = 0
+      node_count        = 1
       preemptible       = true
       min_node_count    = 0
       max_node_count    = 3
@@ -129,7 +129,7 @@ module "cluster" {
         },
         {
           key    = "type"
-          value  = "training"
+          value  = "large"
           effect = "NO_SCHEDULE"
         }
       ]
@@ -148,7 +148,7 @@ module "gcs" {
   location = var.region
   bucket_members = [
     {
-      member = "principal://iam.googleapis.com/projects/${data.google_project.project.number}/locations/global/workloadIdentityPools/${var.project_id}.svc.id.goog/subject/ns/workspace/sa/training",
+      member = "principal://iam.googleapis.com/projects/${data.google_project.project.number}/locations/global/workloadIdentityPools/${var.project_id}.svc.id.goog/subject/ns/workspace/sa/demo1",
       role   = "roles/storage.objectUser"
     }
   ]

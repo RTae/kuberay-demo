@@ -26,6 +26,9 @@ resource "google_container_cluster" "cluster" {
     http_load_balancing {
       disabled = false
     }
+    gcs_fuse_csi_driver_config {
+      enabled = true
+    }
   }
 
   node_pool {
