@@ -147,7 +147,7 @@ locals {
       base_name = "landing-data"
       bucket_members = [
         {
-          member = "principal://iam.googleapis.com/projects/${data.google_project.project.number}/locations/global/workloadIdentityPools/${var.project_id}.svc.id.goog/subject/ns/workspace/sa/demo1",
+          member = "serviceAccount:${module.sa[0].email_sa}",
           role   = "roles/storage.objectUser"
         }
       ]

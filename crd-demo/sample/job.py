@@ -22,13 +22,20 @@ class ImageClassifier:
         batch["label"] = [output[0]["label"] for output in outputs]
         return batch
 
+def prepare_for_output(batch):
+    return {
+        "score": batch["score"],
+        "label": batch["label"],
+        "path": batch["path"]
+    }
+
 if __name__ == "__main__":
 
     image_path = "/mnt/cluster_storage/03102024/"
     batch_size=16
 
     ds = ray.data.read_images(
-        image_path, mode="RGB"
+        image_path, mode="RGB", include_paths=True
     )
 
     predictions = ds.map_batches(
@@ -36,8 +43,13 @@ if __name__ == "__main__":
         concurrency=1,
         num_gpus=1,
         batch_size=batch_size
+    ).map_batches(
+        prepare_for_output,
+        concurrency=1,
+        num_gpus=1,
+        batch_size=batch_size
     )
-    prediction_batch = predictions.iter_batches(batch_size=batch_size)
+    
     print("A few sample predictions: ")
-    for pred in prediction_batch["label"]:
-        print("Label: ", pred)
+    for row in predictions.iter_rows():
+        print(row)
