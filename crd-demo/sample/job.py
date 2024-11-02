@@ -48,8 +48,7 @@ if __name__ == "__main__":
         concurrency=1,
         num_gpus=1,
         batch_size=batch_size
+    ).write_bigquery(
+        project_id="rtae-lab",
+        dataset="landing.result",
     )
-    
-    print("A few sample predictions: ")
-    for row in predictions.iter_rows():
-        print(row)

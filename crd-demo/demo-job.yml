@@ -14,7 +14,7 @@ metadata:
 spec:
   entrypoint: python crd-demo/sample/job.py
   shutdownAfterJobFinishes: true
-  ttlSecondsAfterFinished: 30
+  ttlSecondsAfterFinished: 60
   runtimeEnvYAML: |
     pip:
       - numpy
