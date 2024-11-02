@@ -13,7 +13,7 @@ metadata:
   namespace : workspace
 spec:
   entrypoint: python crd-demo/sample/job.py
-  shutdownAfterJobFinishes: true
+  #shutdownAfterJobFinishes: true
   ttlSecondsAfterFinished: 60
   runtimeEnvYAML: |
     pip:

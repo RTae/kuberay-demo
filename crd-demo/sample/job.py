@@ -53,4 +53,5 @@ if __name__ == "__main__":
     ).write_bigquery(
         project_id="rtae-lab",
         dataset="landing.result",
+        overwrite_table=False
     )
