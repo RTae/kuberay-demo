@@ -29,6 +29,53 @@ export HF_TOKEN=<Hugging Face access token>
 kubectl create secret generic hf-secret --from-literal=hf_api_token=${HF_TOKEN} --dry-run=client -n workspace -o yaml | kubectl apply -f -
 ```
 
+## Setup Nginx
+1. Add Nginx Helm repo
+```
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+```
+2. Install Nginx
+```bash
+helm install ingress-nginx ingress-nginx/ingress-nginx \
+    --version 4.11.3 \
+    --namespace ingress-nginx \
+    --create-namespace
+```
+**optional**
+```bash
+helm upgrade ingress-nginx ingress-nginx/ingress-nginx \
+    --version 4.11.3 \
+    --namespace ingress-nginx \
+    --create-namespace
+```
+
+## Setup Cert-manager
+1. Add Cert Manager Helm repro
+```bash
+helm repo add jetstack https://charts.jetstack.io
+```
+
+2. Install Cert Manager
+```bash
+helm install cert-manager jetstack/cert-manager \
+    --version v1.16.1 \
+    --namespace cert-manager \
+    --create-namespace \
+    --set crds.enabled=true
+```
+
+3. Install cert config
+```bash
+kubectl apply -f ./dependency/cert-manager/cert.yaml
+```
+**optional**
+```bash
+helm upgrade cert-manager jetstack/cert-manager \
+    --version v1.16.1 \
+    --namespace cert-manager \
+    --set crds.enabled=true
+```
+
 ## Setup KubeRay
 1. Add KubeRay Helm repo
 ```
