@@ -94,7 +94,7 @@ helm install crossplane crossplane-stable/crossplane  \
 helm upgrade crossplane crossplane-stable/crossplane  \
     --version 1.17.2 \
     --namespace crossplane-system \
-    --set 'args={"--enable-composition-functions","--enable-composition-webhook-schema-validation", "--enable-composition-revisions", "--enable-environment-configs"}'
+    --set 'args={--enable-composition-functions,--enable-composition-webhook-schema-validation,--enable-composition-revisions,--enable-environment-configs}'
 ```
 
 ## Setup KubeRay

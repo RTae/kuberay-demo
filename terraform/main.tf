@@ -187,7 +187,9 @@ locals {
       name                           = "serving-demo"
       display_name                   = "Serving demo Service Account"
       description                    = "Serving job demo service account"
-      iam_roles                      = []
+      iam_roles                      = [
+        "roles/servicemanagement.serviceController"
+      ]
       workload_identity_user_members = [
         "serviceAccount:${var.project_id}.svc.id.goog[workspace/demo2]"
       ]
@@ -205,4 +207,25 @@ module "sa" {
   description                    = each.value.description
   iam_roles                      = each.value.iam_roles
   workload_identity_user_members = each.value.workload_identity_user_members
+}
+
+locals {
+  esps = [
+    {
+      name            = "llm-serve"
+      invoker_members = [
+        "firebase"
+      ]
+    },
+  ]
+}
+module "esp" {
+  for_each = { for idx, esp in local.esps : idx => esp }
+
+  source = "./modules/esp"
+
+  project_id      = var.project_id
+  name            = each.value.name
+  loadbalancer_ip = "35.187.241.29"
+  invoker_members = each.value.invoker_members
 }
