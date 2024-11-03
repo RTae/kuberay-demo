@@ -17,7 +17,7 @@ curl http://localhost:8000/v1/chat/completions -H "Content-Type: application/jso
       "model": "meta-llama/Llama-3.2-1B-Instruct",
       "messages": [
         {"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "Provide a brief sentence describing the Ray open-source project."}
+        {"role": "user", "content": "Provide a brief sentence describing the DevFest Cloud Bangkok."}
       ],
       "temperature": 0.7
     }'
