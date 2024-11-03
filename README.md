@@ -82,24 +82,19 @@ helm upgrade cert-manager jetstack/cert-manager \
 helm repo add crossplane-stable https://charts.crossplane.io/stable
 ```
 
-1. Install Crossplane
+2. Install Crossplane
 ```bash
 helm install crossplane crossplane-stable/crossplane  \
     --version 1.17.2 \
     --namespace crossplane-system \
     --create-namespace
 ```
-
-1. Install cert config
-```bash
-kubectl apply -f ./dependency/cert-manager/cert.yaml
-```
 **optional**
 ```bash
-helm upgrade cert-manager jetstack/cert-manager \
-    --version v1.16.1 \
-    --namespace cert-manager \
-    --set crds.enabled=true
+helm upgrade crossplane crossplane-stable/crossplane  \
+    --version 1.17.2 \
+    --namespace crossplane-system \
+    --set 'args={"--enable-composition-functions","--enable-composition-webhook-schema-validation", "--enable-composition-revisions", "--enable-environment-configs"}'
 ```
 
 ## Setup KubeRay

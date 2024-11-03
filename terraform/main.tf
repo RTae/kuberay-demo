@@ -183,6 +183,15 @@ locals {
         "serviceAccount:${var.project_id}.svc.id.goog[workspace/demo1]"
       ]
     },
+    {
+      name                           = "serving-demo"
+      display_name                   = "Serving demo Service Account"
+      description                    = "Serving job demo service account"
+      iam_roles                      = []
+      workload_identity_user_members = [
+        "serviceAccount:${var.project_id}.svc.id.goog[workspace/demo2]"
+      ]
+    },
   ]
 }
 module "sa" {
