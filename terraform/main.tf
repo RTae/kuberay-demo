@@ -57,10 +57,10 @@ module "cluster" {
       name              = "head"
       zone              = "c"
       machine_type      = "n1-standard-4"
-      node_count        = 1
+      node_count        = 2
       preemptible       = true
-      min_node_count    = 1
-      max_node_count    = 1
+      min_node_count    = 2
+      max_node_count    = 2
       disk_size_gb      = 128
       max_pods_per_node = 60
       labels = {
