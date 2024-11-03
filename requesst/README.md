@@ -1,4 +1,4 @@
-# Load Test
+# Test Request
 
 ## Setup
 ```bash
