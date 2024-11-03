@@ -19,3 +19,8 @@ variable "invoker_members" {
   description = "The list of the user which could invoker this service"
   default     = []
 }
+
+variable "binding_sa_email" {
+  type        = string
+  description = "Binding service account"
+}

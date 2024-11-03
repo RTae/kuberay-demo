@@ -1,3 +1,11 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: demo2
+  namespace: workspace
+  annotations:
+    iam.gke.io/gcp-service-account: serving-demo@rtae-lab.iam.gserviceaccount.com
+---
 apiVersion: ray.io/v1
 kind: RayService
 metadata:
@@ -29,7 +37,13 @@ spec:
       rayStartParams:
         dashboard-host: '0.0.0.0'
       template:
+        metadata:
+          labels:
+            app: llm-gemma
         spec:
+          serviceAccountName: demo2
+          nodeSelector:
+            iam.gke.io/gke-metadata-server-enabled: "true"
           containers:
           - name: ray-head
             image: rayproject/ray-ml:2.33.0.914af0-py311
@@ -55,6 +69,16 @@ spec:
                 secretKeyRef:
                   name: hf-secret
                   key: hf_api_token
+          - name: proxy
+            image: gcr.io/endpoints-release/endpoints-runtime:2.50.0
+            args:
+              - "--service=llm-serve-a9rh.endpoints.rtae-lab.cloud.goog"
+              - "--backend=http://127.0.0.1:8000"
+              - "--listener_port=8081"
+              - "--rollout_strategy=managed"
+              - "--healthz=/healthz"
+            ports:
+            - containerPort: 8081
           tolerations:
           - key: node
             operator: Equal
@@ -76,6 +100,9 @@ spec:
       rayStartParams: {}
       template:
         spec:
+          serviceAccountName: demo2
+          nodeSelector:
+            iam.gke.io/gke-metadata-server-enabled: "true"
           containers:
           - name: llm
             image: rayproject/ray-ml:2.33.0.914af0-py311-gpu
@@ -110,3 +137,46 @@ spec:
                     operator: In
                     values:
                     - "ray-worker"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm-serve-esp-svc
+  namespace: workspace
+spec:
+  ports:
+  - port: 80
+    targetPort: 8081
+    protocol: TCP
+    name: http
+  selector:
+    app: llm-gemma
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: llm-serve-ingress
+  namespace: workspace
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+spec:
+  ingressClassName: "nginx"
+  tls:
+    - hosts:
+      - llm-serve-a9rh.endpoints.rtae-lab.cloud.goog
+      secretName: llm-serve-a9rh
+  rules:
+    - host: llm-serve-a9rh.endpoints.rtae-lab.cloud.goog
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: llm-serve-esp-svc
+              port:
+                number: 80

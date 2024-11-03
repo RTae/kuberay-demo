@@ -130,5 +130,19 @@ resource "google_project_service" "enable-proxy" {
     update = "40m"
   }
   
-  depends_on = [google_endpoints_service.spec]
+  depends_on = [
+    google_endpoints_service.spec
+  ]
+}
+
+resource "google_endpoints_service_iam_binding" "endpoint" {
+  service_name = google_endpoints_service.spec.dns_address
+  role = "roles/servicemanagement.serviceController"
+  members = [
+    "serviceAccount:${var.binding_sa_email}",
+  ]
+
+  depends_on = [
+    google_endpoints_service.spec
+  ]
 }

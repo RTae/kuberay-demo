@@ -187,9 +187,7 @@ locals {
       name                           = "serving-demo"
       display_name                   = "Serving demo Service Account"
       description                    = "Serving job demo service account"
-      iam_roles                      = [
-        "roles/servicemanagement.serviceController"
-      ]
+      iam_roles                      = []
       workload_identity_user_members = [
         "serviceAccount:${var.project_id}.svc.id.goog[workspace/demo2]"
       ]
@@ -224,8 +222,13 @@ module "esp" {
 
   source = "./modules/esp"
 
-  project_id      = var.project_id
-  name            = each.value.name
-  loadbalancer_ip = "35.187.241.29"
-  invoker_members = each.value.invoker_members
+  project_id       = var.project_id
+  name             = each.value.name
+  loadbalancer_ip  = "35.187.241.29"
+  invoker_members  = each.value.invoker_members
+  binding_sa_email = module.sa[1].email_sa
+
+  depends_on = [
+    module.sa
+  ]
 }
